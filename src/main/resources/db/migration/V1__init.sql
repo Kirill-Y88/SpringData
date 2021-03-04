@@ -1,5 +1,5 @@
-create table students (id bigserial primary key, name varchar(255), score int);
-insert into students (name, score) values
+create table products (id bigserial primary key, name varchar(255), cost int);
+insert into products (name, cost) values
 ('Potato', 80),
 ('Orange', 10),
 ('Onion', 99),
