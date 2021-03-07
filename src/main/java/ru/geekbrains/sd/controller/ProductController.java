@@ -4,8 +4,10 @@ package ru.geekbrains.sd.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.sd.model.Product;
+import ru.geekbrains.sd.model.SortDir;
 import ru.geekbrains.sd.services.ProductService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,8 +18,31 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
-    public List<Product> getAll(){
-        return productService.getAll();
+    public List<Product> getAll(@RequestParam(defaultValue = "0") Integer page,
+                                @RequestParam(defaultValue = "10") Integer size,
+                                @RequestParam(required = false)SortDir sortName,
+                                @RequestParam(required = false)SortDir sortCost
+                                )  {
+        List<Product>products;
+        if(page < 0 || size < 0 ){
+            return error(" Введены неверные значения ");
+        }
+        if( (products = productService.getAll(page,size,sortName,sortCost)).size() == 0){
+            return error(" Товары закончились ");
+        }
+        else {
+            return products;
+        }
+    }
+
+    @GetMapping("/err")
+    public List<Product> error(String msg){
+        List <Product> errList = new ArrayList<>();
+        Product err = new Product();
+        err.setName(msg);
+        err.setCost(555);
+        errList.add(err);
+        return errList;
     }
 
     @GetMapping("/getById/{id}")
@@ -33,7 +58,7 @@ public class ProductController {
     @DeleteMapping("/delete")
     public void delete(@RequestParam Long id){
         productService.delete(id);
-        getAll();
+       // productService.getAll();
     }
 
     @GetMapping("/findLess")
